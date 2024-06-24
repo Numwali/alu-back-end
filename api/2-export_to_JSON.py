@@ -8,7 +8,7 @@ import sys
 
 
 def main():
-    ""The main functionality"""
+    """The main functionality"""
     user_id = int(sys.argv[1])
     todo_url = 'https://jsonplaceholder.typicode.com/todos'
     user_url = 'https://jsonplaceholder.typicode.com/users/{}'.format(user_id)
