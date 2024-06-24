@@ -1,43 +1,36 @@
 #!/usr/bin/python3
-"""
-This script fetches and displays employee TODO list progress from a REST API.
-"""
-import json
+"""Script to get todos for a user from API"""
+
+import requests
 import sys
-import urllib.request
 
-def get_employee_todo_progress(employee_id):
-    """
-    Fetches and displays employee TODO list progress from a REST API.
 
-    Args:
-        employee_id: The ID of the employee.
+def main():
+    """main function"""
+    user_id = int(sys.argv[1])
+    todo_url = 'https://jsonplaceholder.typicode.com/todos'
+    user_url = 'https://jsonplaceholder.typicode.com/users/{}'.format(user_id)
 
-    Returns:
-        None
-    """
-    if len(sys.argv) != 2:
-        print("Usage: python todo_progress.py <employee_id>")
-        sys.exit(1)
+    response = requests.get(todo_url)
 
-    employee_id = int(sys.argv[1])
+    total_questions = 0
+    completed = []
+    for todo in response.json():
 
-    url = f"https://jsonplaceholder.typicode.com/users/{employee_id}/todos"
-    with urllib.request.urlopen(url) as response:
-        data = json.loads(response.read().decode('utf-8'))
+        if todo['userId'] == user_id:
+            total_questions += 1
 
-    done_tasks = 0
-    for task in data:
-        if task.get('completed'):
-            done_tasks += 1
+            if todo['completed']:
+                completed.append(todo['title'])
 
-    employee_name = data[0].get('userId', 'Unknown Employee')
-    total_tasks = len(data)
+    user_name = requests.get(user_url).json()['name']
 
-    print(f"Employee {employee_name} is done with tasks({done_tasks}/{total_tasks}):")
-    for task in data:
-        if task.get('completed'):
-            print(f"\t{task.get('title')}")
+    printer = ("Employee {} is done with tasks({}/{}):".format(user_name,
+               len(completed), total_questions))
+    print(printer)
+    for q in completed:
+        print("\t {}".format(q))
 
-if __name__ == "__main__":
-    get_employee_todo_progress(employee_id)
+
+if __name__ == '__main__':
+    main()
